@@ -19,6 +19,7 @@
 	later be freed which would not work with the non-heap
 	allocated readbuffer address
 Free line if line NULL case? use line instead of output?
+REMOVE OUTPUT AND LINE FREE TRY________________________________________
 */
 
 char	*ft_appendbuffertoline(char *line, char *readbuffer)
@@ -31,16 +32,7 @@ char	*ft_appendbuffertoline(char *line, char *readbuffer)
 	i = 0;
 	len_readbuffer = ft_strlen(readbuffer);
 	if (!line)
-	{
-		output = malloc((len_readbuffer + 1) * sizeof(char));
-		while (readbuffer[i])
-		{
-			output[i] = readbuffer[i];
-			i++;
-		}
-		output[i] = 0;
-		return (output);
-	}
+		return (ft_strdup(readbuffer));
 	len_line = ft_strlen(line);
 	output = malloc((len_line + len_readbuffer + 1) * sizeof(char));
 	while (line[i])
@@ -66,54 +58,12 @@ char	*ft_appendbuffertoline(char *line, char *readbuffer)
 
 char	*ft_remainderintoline(char **remainder, int fd)
 {
-	int		i;
-	int		len_remainder;
 	char	*output;
 
-	i = 0;
-	len_remainder = ft_strlen(remainder[fd]);
-	output = malloc((len_remainder + 1) * sizeof(char));
-	if (!output)
-		return (NULL);
-	while (remainder[fd][i])
-	{	
-		output[i] = remainder[fd][i];
-		i++;
-	}
-	output[i] = 0;
+	output = ft_strdup(remainder[fd]);
 	free(remainder[fd]);
 	remainder[fd] = NULL;
 	return (output);
-}
-
-/*
-- Searches for \n
-- If found, returns index of \n
-- If not found returns 0
-*/
-
-int	ft_findnewline(char *line)
-{
-	int	i;
-
-	i = 0;
-	while (line[i])
-	{
-		if (line[i] == '\n')
-			return (i);
-		i++;
-	}
-	return (0);
-}
-
-int	ft_strlen(const char *s)
-{
-	int	i;
-
-	i = 0;
-	while (s[i])
-		i++;
-	return (i);
 }
 
 /*
@@ -122,11 +72,9 @@ int	ft_strlen(const char *s)
 	should be empty:
 	- Nulls remainder and frees
 	- returns line
-- Mallocs for remainder: the size of line minus the length of the output
-	(which corresponds to the index of the first \n in line) + 1 for 0 byte
-- Increments i_newline (see next points why)
-- Copies from line into remainder, starting at \n + 1
-- 0 terminates remainder
+- If there remains content after \n, this is saved in remainder
+	- strdup beginning with the position after the first \n
+		in line.
 - 0 terminates line after the first \n
 - this means line is bigger than the contained string but I didn't want to 
 	make a new malloc and free the old line.
@@ -134,27 +82,18 @@ int	ft_strlen(const char *s)
 
 char	*ft_makeremainder_returnoutput(char *line, char **remainder, int fd)
 {
-	int		i;
-	int		i_newline;
+	int		ind_newline;
 	int		len_line;
 
-	i = 0;
-	i_newline = ft_findnewline(line);
+	ind_newline = ft_findnewline(line);
 	len_line = ft_strlen(line);
-	if (i_newline == len_line - 1)
+	if (ind_newline == len_line - 1)
 	{
 		free(remainder[fd]);
 		remainder[fd] = NULL;
 		return (line);
 	}
-	remainder[fd] = malloc((len_line - i_newline + 1) * sizeof(char));
-	i_newline++;
-	while (line[i_newline + i])
-	{
-		remainder[fd][i] = line[i_newline + i];
-		++i;
-	}		
-	remainder[fd][i] = 0;
-	line[i_newline] = 0;
+	remainder[fd] = ft_strdup(line + ind_newline + 1);
+	line[ind_newline + 1] = 0;
 	return (line);
 }

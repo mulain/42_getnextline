@@ -6,14 +6,14 @@
 #    By: wmardin <wmardin@student.42wolfsburg.de    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/20 21:58:19 by wmardin           #+#    #+#              #
-#    Updated: 2022/05/25 18:11:06 by wmardin          ###   ########.fr        #
+#    Updated: 2022/05/26 18:51:39 by wmardin          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = get_next_line.a
 
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -D BUFFER_SIZE=4
+CFLAGS = -Wall -Wextra -Werror -D BUFFER_SIZE=1000
 
 AR = ar rcs
 
