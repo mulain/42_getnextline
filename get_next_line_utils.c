@@ -14,15 +14,14 @@
 
 /*
 - Appends the readbuffer to line
+- First, a 0 byte is added at index = amount of read bytes; now we have a string
 - If line is NULL, returns only the content of the readbuffer.
-- Readbuffer is not directly returned, because the return might
-	later be freed which would not work with the non-heap
-	allocated readbuffer address
-Free line if line NULL case? use line instead of output?
-REMOVE OUTPUT AND LINE FREE TRY________________________________________
+- If line is not NULL, mallocs for line and readbuffer
+- Copies line and readbuffer into the malloc'd address and 0 terminates
+- Frees line and returns the malloc'd address as the new line
 */
 
-char	*ft_appendbuffertoline(char *line, char *readbuffer)
+char	*ft_appendbuffertoline(char *line, char *readbuffer, int readreturn)
 {
 	int		i;
 	int		len_readbuffer;
@@ -30,6 +29,7 @@ char	*ft_appendbuffertoline(char *line, char *readbuffer)
 	char	*output;
 
 	i = 0;
+	readbuffer[readreturn] = 0;
 	len_readbuffer = ft_strlen(readbuffer);
 	if (!line)
 		return (ft_strdup(readbuffer));
@@ -51,24 +51,28 @@ char	*ft_appendbuffertoline(char *line, char *readbuffer)
 }
 
 /*
-- Transfers the remainder into line
-- NULLs the remainder so it won't trigger main function start-if
-- Frees the remainder
+- Searches for \n
+- If found, returns index of \n
+- If not found, returns -1 (index could be 0)
 */
 
-char	*ft_remainderintoline(char **remainder, int fd)
+int	ft_findnewline(const char *line)
 {
-	char	*output;
+	int	i;
 
-	output = ft_strdup(remainder[fd]);
-	free(remainder[fd]);
-	remainder[fd] = NULL;
-	return (output);
+	i = 0;
+	while (line[i])
+	{
+		if (line[i] == '\n')
+			return (i);
+		i++;
+	}
+	return (-1);
 }
 
 /*
 - Measures length of line and position of \n
-- If \n is at the last position of the line, then remainder
+- If \n is at the last position of line, then remainder
 	should be empty:
 	- Nulls remainder and frees
 	- returns line
@@ -96,4 +100,30 @@ char	*ft_makeremainder_returnoutput(char *line, char **remainder, int fd)
 	remainder[fd] = ft_strdup(line + ind_newline + 1);
 	line[ind_newline + 1] = 0;
 	return (line);
+}
+
+char	*ft_strdup(const char *source)
+{
+	int		i;
+	char	*output;
+
+	i = 0;
+	output = malloc((ft_strlen(source) + 1) * sizeof(char));
+	while (source[i])
+	{
+		output[i] = source[i];
+		i++;
+	}
+	output[i] = 0;
+	return (output);
+}
+
+int	ft_strlen(const char *s)
+{
+	int	i;
+
+	i = 0;
+	while (s[i])
+		i++;
+	return (i);
 }
